@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.31903.286
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoverPDF", "RoverPDF\RoverPDF.csproj", "{9964A86B-939C-454B-B0B0-EB8DFB9815CF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoverPDFTest", "RoverPDFTest\RoverPDFTest.csproj", "{8C7D3DA1-BBE0-406F-8D6D-E61967B013C9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9964A86B-939C-454B-B0B0-EB8DFB9815CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9964A86B-939C-454B-B0B0-EB8DFB9815CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9964A86B-939C-454B-B0B0-EB8DFB9815CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9964A86B-939C-454B-B0B0-EB8DFB9815CF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8C7D3DA1-BBE0-406F-8D6D-E61967B013C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C7D3DA1-BBE0-406F-8D6D-E61967B013C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C7D3DA1-BBE0-406F-8D6D-E61967B013C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8C7D3DA1-BBE0-406F-8D6D-E61967B013C9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C7CB7458-4B44-4F5F-A9DE-F0B886D98CA3}
+	EndGlobalSection
+EndGlobal
