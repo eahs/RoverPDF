@@ -35,7 +35,14 @@ namespace RoverPDF
 
             if (allowed.Contains(mimetype))
             {
-                _docs.Add(new RoverDocumentContainer(path, mimetype));
+                if (File.Exists(path))
+                {
+                    _docs.Add(new RoverDocumentContainer(path, mimetype));
+                }
+                else
+                {
+                    _logger?.LogError($"Document at {path} not found!");
+                }
             }
             else
             {
