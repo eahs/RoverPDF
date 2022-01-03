@@ -48,6 +48,15 @@ namespace RoverPDF
             _docs.Add(new RoverDocumentContainer(pdf));
         }
 
+        /// <summary>
+        /// Appends all the pages of document onto this document
+        /// </summary>
+        /// <param name="document"></param>
+        public void AddDocument(RoverDocument document)
+        {
+            _docs.AddRange(document._docs);
+        }
+
         private byte[]? RenderDocument(RoverDocumentContainer doc)
         {
             try
@@ -70,6 +79,12 @@ namespace RoverPDF
         }
 
         public void Save(string path)
+        {
+            FileStream stream = new FileStream(path, FileMode.Create);
+            Save(stream);
+        }
+
+        public void Save(Stream stream, bool closeStream = true)
         {
             PdfDocument outputDocument = new PdfDocument();
 
@@ -112,7 +127,10 @@ namespace RoverPDF
 
             // Save the document
             if (_docs.Count > 0)
-                outputDocument.Save(path);
+            {
+                outputDocument.Save(stream, closeStream);
+            }
+
         }
 
         private void RegisterFonts()
