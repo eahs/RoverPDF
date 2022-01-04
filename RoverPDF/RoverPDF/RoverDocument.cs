@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using PdfSharpCore.Drawing;
 using PdfSharpCore.Pdf;
 using PdfSharpCore.Pdf.IO;
 using QuestPDF.Drawing;
@@ -14,6 +15,9 @@ namespace RoverPDF
         private readonly ILogger? _logger;
         private List<RoverDocumentContainer> _docs { get; set; }
         private string _fontPath { get; set; }
+
+        public int FirstPageNumber { get; set; } = 1;
+        public bool IncludePageNumbers { get; set; } = false;
 
         public RoverDocument(Logger<RoverDocument>? logger = null, string fontPath = "./Fonts/")
         {
@@ -96,7 +100,7 @@ namespace RoverPDF
             PdfDocument outputDocument = new PdfDocument();
 
             // Show consecutive pages facing. Requires Acrobat 5 or higher.
-            outputDocument.PageLayout = PdfPageLayout.TwoColumnLeft;
+            outputDocument.PageLayout = PdfPageLayout.SinglePage;
 
             // Iterate files
             foreach (var doc in _docs)
@@ -135,9 +139,38 @@ namespace RoverPDF
             // Save the document
             if (_docs.Count > 0)
             {
+                if (IncludePageNumbers)
+                    AddPageNumbers(outputDocument);
+
                 outputDocument.Save(stream, closeStream);
             }
 
+        }
+
+        private void AddPageNumbers(PdfDocument document)
+        {
+            XFont font = new XFont("Poppins Regular", 8);
+            XBrush brush = XBrushes.Black;
+
+            // Add the page counter.
+            string noPages = document.Pages.Count.ToString();
+            for (int i = FirstPageNumber-1; i < document.Pages.Count; i++)
+            {
+                PdfPage page = document.Pages[i];
+
+                // Make a layout rectangle.
+                XRect layoutRectangle = new XRect(25/*X*/, page.Height - 25 - font.Height/*Y*/, page.Width-50/*Width*/, font.Height/*Height*/);
+
+                using (XGraphics gfx = XGraphics.FromPdfPage(page))
+                {
+                    gfx.DrawString(
+                        "Page " + (i + 1).ToString() + " of " + noPages,
+                        font,
+                        brush,
+                        layoutRectangle,
+                        XStringFormats.CenterRight);
+                }
+            }
         }
 
         private void RegisterFonts()
