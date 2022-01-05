@@ -175,7 +175,7 @@ namespace RoverPDF
 
         private void RegisterFonts()
         {
-
+            
             FontManager.RegisterFontType("Poppins Black", File.OpenRead(FontPath("Poppins-Black.ttf")));
             FontManager.RegisterFontType("Poppins Bold", File.OpenRead(FontPath("Poppins-Bold.ttf")));
             FontManager.RegisterFontType("Poppins SemiBold", File.OpenRead(FontPath("Poppins-SemiBold.ttf")));
@@ -188,7 +188,7 @@ namespace RoverPDF
 
         private string FontPath(string fontFile)
         {
-            return Path.Combine(_fontPath, fontFile);
+            return Path.Combine(Directory.GetCurrentDirectory(), _fontPath, fontFile);
         }
     }
 }
