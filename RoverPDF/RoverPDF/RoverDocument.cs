@@ -105,34 +105,42 @@ namespace RoverPDF
             // Iterate files
             foreach (var doc in _docs)
             {
-                byte[]? fbuff = RenderDocument(doc);
-
-                if (fbuff != null)
+                try
                 {
-                    using (MemoryStream m = new MemoryStream(fbuff))
+                    byte[]? fbuff = RenderDocument(doc);
+
+                    if (fbuff != null)
                     {
-                        // Open the document to import pages from it.
-                        PdfDocument inputDocument = PdfReader.Open(m, PdfDocumentOpenMode.Import); // file
-
-                        // Iterate pages
-                        int count = inputDocument.PageCount;
-                        for (int idx = 0; idx < count; idx++)
+                        using (MemoryStream m = new MemoryStream(fbuff))
                         {
-                            // Get the page from the external document...
-                            PdfPage page = inputDocument.Pages[idx];
+                            // Open the document to import pages from it.
+                            PdfDocument inputDocument = PdfReader.Open(m, PdfDocumentOpenMode.Import); // file
 
-                            // Rotate landscape pages to be portrait
-                            if (page.Width > page.Height)
+                            // Iterate pages
+                            int count = inputDocument.PageCount;
+                            for (int idx = 0; idx < count; idx++)
                             {
-                                page.Rotate = -90;
-                                page.Orientation = PdfSharpCore.PageOrientation.Portrait;
+                                // Get the page from the external document...
+                                PdfPage page = inputDocument.Pages[idx];
+
+                                // Rotate landscape pages to be portrait
+                                if (page.Width > page.Height)
+                                {
+                                    page.Rotate = -90;
+                                    page.Orientation = PdfSharpCore.PageOrientation.Portrait;
+                                }
+
+                                outputDocument.AddPage(page);
                             }
 
-                            outputDocument.AddPage(page);
                         }
 
                     }
 
+                }
+                catch (Exception e)
+                {
+                    _logger?.LogError(e, $"Unable to add document {doc.Filepath} to output");
                 }
             }
 
