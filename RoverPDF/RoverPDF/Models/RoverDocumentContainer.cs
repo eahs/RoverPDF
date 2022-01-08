@@ -15,25 +15,31 @@ namespace RoverPDF.Models
     public class RoverDocumentContainer
     {
 
-        public RoverDocumentContainer (byte[] doc)
+        public RoverDocumentContainer (byte[] doc, string? bookmarkTitle = null)
         {
-            this.DocumentType = RoverDocType.BYTE_ARRAY;
-            this.Data = doc;
-            this.Filepath = "";
-            this.MimeType = "";
+            DocumentType = RoverDocType.BYTE_ARRAY;
+            Data = doc;
+            Filepath = "";
+            MimeType = "";
+            BookmarkTitle = bookmarkTitle;
+            Bookmarked = bookmarkTitle is not null;
         }
 
-        public RoverDocumentContainer (string filePath, string mimeType)
+        public RoverDocumentContainer (string filePath, string mimeType, string? bookmarkTitle = null)
         {
             DocumentType = RoverDocType.FILE;
             Data = null;
             Filepath = filePath;
             MimeType = mimeType;
+            BookmarkTitle = bookmarkTitle;
+            Bookmarked = bookmarkTitle is not null;
         }
 
         public RoverDocType DocumentType { get; set; }
         public string Filepath { get; set; }
         public string MimeType { get; set; }
         public byte[]? Data { get; set; }
+        public string? BookmarkTitle { get; set; }
+        public bool Bookmarked { get; set; }
     }
 }

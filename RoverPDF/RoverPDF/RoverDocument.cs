@@ -19,6 +19,8 @@ namespace RoverPDF
         public int FirstPageNumber { get; set; } = 1;
         public bool IncludePageNumbers { get; set; } = false;
 
+        public int Count => _docs?.Count ?? 0;
+
         public RoverDocument(Logger<RoverDocument>? logger = null, string fontPath = "./Fonts/")
         {
             _docs = new List<RoverDocumentContainer>();
@@ -28,12 +30,17 @@ namespace RoverPDF
             RegisterFonts();
         }
 
-        public void AddDocument(IDocument document)
+        /// <summary>
+        /// Adds a QuestPDF document along with an optional bookmark for this document - If bookmark title is null then no bookmark is added
+        /// </summary>
+        /// <param name="document"></param>
+        /// <param name="bookmarkTitle"></param>
+        public void AddDocument(IDocument document, string? bookmarkTitle = null)
         {
-            _docs.Add(new RoverDocumentContainer(document.GeneratePdf()));
+            _docs.Add(new RoverDocumentContainer(document.GeneratePdf(), bookmarkTitle));
         }
 
-        public void AddDocument(string path, string mimetype)
+        public void AddDocument(string path, string mimetype, string? bookmarkTitle = null)
         {
             string[] allowed = { "application/pdf", "image/bmp", "image/jpeg", "image/png" };
 
@@ -41,7 +48,7 @@ namespace RoverPDF
             {
                 if (File.Exists(path))
                 {
-                    _docs.Add(new RoverDocumentContainer(path, mimetype));
+                    _docs.Add(new RoverDocumentContainer(path, mimetype, bookmarkTitle));
                 }
                 else
                 {
@@ -54,9 +61,9 @@ namespace RoverPDF
             }
         }
 
-        public void AddDocument(byte[] pdf)
+        public void AddDocument(byte[] pdf, string? bookmarkTitle = null)
         {
-            _docs.Add(new RoverDocumentContainer(pdf));
+            _docs.Add(new RoverDocumentContainer(pdf, bookmarkTitle));
         }
 
         /// <summary>
@@ -89,18 +96,23 @@ namespace RoverPDF
             return null;
         }
 
-        public void Save(string path)
+        public SavedDocumentMetadata Save(string path)
         {
             FileStream stream = new FileStream(path, FileMode.Create);
-            Save(stream);
+            return Save(stream);
         }
 
-        public void Save(Stream stream, bool closeStream = true)
+        public SavedDocumentMetadata Save(Stream stream, bool closeStream = true)
         {
             PdfDocument outputDocument = new PdfDocument();
+            List<Bookmark> bookmarks = new List<Bookmark>();
 
             // Show consecutive pages facing. Requires Acrobat 5 or higher.
             outputDocument.PageLayout = PdfPageLayout.SinglePage;
+
+            PdfOutlineCollection currentOutline = null;
+
+            int pcount = 0;
 
             // Iterate files
             foreach (var doc in _docs)
@@ -131,6 +143,34 @@ namespace RoverPDF
                                 }
 
                                 outputDocument.AddPage(page);
+
+                                if (doc.Bookmarked && idx == 0)
+                                {
+                                    int pageno = outputDocument.PageCount - 1;
+                                    var ownedPage = outputDocument.Pages[pageno];
+
+                                    currentOutline ??= outputDocument.Outlines;
+
+                                    string title = doc.BookmarkTitle!;
+
+                                    // Sub-bookmarks start with a plus
+                                    if (title.StartsWith("+"))
+                                    {
+                                        title = title.Substring(1);
+                                        currentOutline.Add(title, ownedPage);
+                                    }
+                                    else
+                                    {
+                                        currentOutline = outputDocument.Outlines.Add(title, ownedPage).Outlines;
+                                    }
+
+                                    bookmarks.Add(new Bookmark
+                                    {
+                                        Page = pageno+1,
+                                        Title = doc.BookmarkTitle ?? "Scholarship"
+                                    });
+                                }
+
                             }
 
                         }
@@ -143,7 +183,7 @@ namespace RoverPDF
                     _logger?.LogError(e, $"Unable to add document {doc.Filepath} to output");
                 }
             }
-
+            
             // Save the document
             if (_docs.Count > 0)
             {
@@ -153,6 +193,12 @@ namespace RoverPDF
                 outputDocument.Save(stream, closeStream);
             }
 
+            var meta = new SavedDocumentMetadata
+            {
+                Bookmarks = bookmarks
+            };
+
+            return meta;
         }
 
         private void AddPageNumbers(PdfDocument document)
