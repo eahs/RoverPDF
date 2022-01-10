@@ -110,9 +110,7 @@ namespace RoverPDF
             // Show consecutive pages facing. Requires Acrobat 5 or higher.
             outputDocument.PageLayout = PdfPageLayout.SinglePage;
 
-            PdfOutlineCollection currentOutline = null;
-
-            int pcount = 0;
+            PdfOutlineCollection? currentOutline = null;
 
             // Iterate files
             foreach (var doc in _docs)
